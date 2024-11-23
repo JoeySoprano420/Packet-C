@@ -1,0 +1,4 @@
+<packet> ::= "packet" <identifier> "{" <capsule>* "}"
+<capsule> ::= "capsule" <identifier> "{" <statement>* "}"
+<statement> ::= <assignment> | <function_call> | <control_flow>
+<assignment> ::= <identifier> "=" <expression> ";"

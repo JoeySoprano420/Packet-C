@@ -116,3 +116,37 @@ packet ExternalIntegration {
     }
 }
 
+packet MainNode {
+    capsule Loader {
+        @loads "resources/main_config";
+        key bits: setupEnvironment();
+        deposit: success_flag;
+    }
+
+    capsule Compute {
+        bridge Loader -> Processor {
+            flow: execute_main_computation(args);
+            output -> result;
+        }
+    }
+
+    capsule Output {
+        +Printer {
+            @loads "io/print_module";
+            flow: print_result(result);
+        }
+    }
+}
+
+packet PythonInterop {
+    cable PythonBridge {
+        @link "external_script.py";
+        function: external_function(args);
+    }
+
+    capsule Execute {
+        key bits: result = external_function(input_data);
+        deposit: result;
+    }
+}
+

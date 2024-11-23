@@ -1,0 +1,35 @@
+# Enable functional comments
+@allow memory_management;
+
+packet MainNode {
+    capsule Initialize {
+        @loads "core.lhm";
+        comp flow_main + settings_main;
+    }
+
+    capsule Execute {
+        +flow_main {
+            key bits: "Execution Started";
+            @capture "data-stream";
+        }
+
+        +settings_main {
+            bridge: main_pipeline -> results_pipeline;
+            # Comments can function as toggleable actions
+            cp: validate_runtime;
+        }
+    }
+
+    capsule Cleanup {
+        @allow garbage_cycle;
+        funnel {
+            deposit: "temp.memory";
+            withdraw: "final.results";
+        }
+    }
+}
+
+node MainNode {
+    flow: Execute -> Cleanup;
+    snapshot: true;
+}

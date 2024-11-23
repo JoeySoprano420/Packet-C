@@ -33,3 +33,86 @@ node MainNode {
     flow: Execute -> Cleanup;
     snapshot: true;
 }
+
+function LIHMCRAI_Transition(packet):
+    hash_map = create_hash(packet.instructions)
+    for instruction in packet.instructions:
+        reference = hash_map[instruction]
+        link_instruction(reference)
+    return linked_packet
+
+function Memory_Funnel(action, resource):
+    if action == "deposit":
+        funnel.add(resource)
+    elif action == "withdraw":
+        return funnel.retrieve(resource)
+    else:
+        throw Error("Invalid Funnel Action")
+
+function Advanced_Clipping(flow):
+    redundant_paths = detect_redundancies(flow)
+    for path in redundant_paths:
+        flow.remove(path)
+    optimize_flow(flow)
+    return flow
+
+
+packet NodeExample {
+    capsule Start {
+        key bits: "Initialize";
+        @loads "runtime.lhm";
+        bridge: memory_pipeline -> compute_pipeline;
+    }
+    
+    capsule Compute {
+        comp add: data1 + data2;
+        @capture "results_cache";
+    }
+    
+    capsule Cleanup {
+        @allow garbage_cycle;
+        funnel {
+            deposit: "final.results";
+            withdraw: "temp.memory";
+        }
+    }
+}
+
+cable ExternalCall {
+    @link "external_script.py";
+    function: call_python_function(args);
+}
+
+packet InteropExample {
+    capsule ImportExternal {
+        @loads "numpy"; // Access Python's NumPy library
+        key bits: "Run matrix operations";
+    }
+}
+
+capsule ErrorProfile {
+    @allow custom_rules;
+    rule: handle_null_reference;
+}
+
+debug.start("MainNode");
+debug.matrix("MainNode");
+
+// Visualize packet-to-packet interactions
+debug.optimize();
+debug.logs(show_active=true);
+
+packet ExternalIntegration {
+    cable PythonInterop {
+        @link "math_utils.py";
+        function: calculate_square_root(args);
+    }
+    
+    capsule Execute {
+        +PythonInterop {
+            key bits: result = calculate_square_root(64);
+            deposit: result;
+        }
+    }
+}
+
